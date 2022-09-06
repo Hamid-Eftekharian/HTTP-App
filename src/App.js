@@ -2,29 +2,48 @@ import Axios from "axios";
 import React, { Component } from "react";
 import "./App.css";
 
+const apiEndpoint = "https://jsonplaceholder.typicode.com/posts";
+
 class App extends Component {
   state = {
     posts: [],
   };
 
   async componentDidMount() {
-    const { data: posts } = await Axios.get(
-      "https://jsonplaceholder.typicode.com/posts"
-    );
+    const { data: posts } = await Axios.get(apiEndpoint);
     this.setState({ posts });
   }
 
-  handleAdd = () => {
-    const obj = { a: 1, b: "2" };
-    console.log("Add");
+  handleAdd = async () => {
+    const obj = { title: "a", body: "b", id: 123 };
+    const { data: post } = await Axios.post(apiEndpoint, obj);
+
+    const posts = [post, ...this.state.posts];
+    this.setState({ posts });
   };
 
-  handleUpdate = (post) => {
-    console.log("Update", post);
+  handleUpdate = async (post) => {
+    post.title = "Updated";
+    await Axios.put(apiEndpoint + "/" + post.id, post);
+
+    const posts = this.state.posts;
+    const index = posts.indexOf(post);
+    posts[index] = { ...post };
+    this.setState({ posts });
   };
 
-  handleDelete = (post) => {
-    console.log("Delete", post);
+  handleDelete = async (post) => {
+    const originPosts = this.state.posts;
+
+    const posts = this.state.posts.filter((p) => p.id !== post.id);
+    this.setState({ posts });
+    try {
+      await Axios.delete(apiEndpoint + "/" + post.id);
+      throw new Error("");
+    } catch (ex) {
+      alert("Something went wrong during deleting the post!");
+      this.setState({ posts: originPosts });
+    }
   };
 
   render() {
