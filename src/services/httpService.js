@@ -1,4 +1,5 @@
 import Axios from "axios";
+import { toast } from "react-toastify";
 
 Axios.interceptors.response.use(null, (error) => {
   const expectedError =
@@ -8,7 +9,7 @@ Axios.interceptors.response.use(null, (error) => {
 
   if (!expectedError) {
     console.log("There is an Error: ", error);
-    alert("Something went wrong during deleting the poost!");
+    toast.error("An unexpected error ocurred!");
   }
 
   return Promise.reject(error);
